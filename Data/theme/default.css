@@ -1,0 +1,493 @@
+body {
+    font-family: "Noto Sans SC", "Noto Sans JP", "Microsoft YaHei", Arial, sans-serif;
+    background: #edf2fa;
+    margin: 0;
+    padding: 0;
+}
+
+.tweet-container {
+    max-width: 600px;
+    margin: 20px auto;
+    background: white;
+    border-radius: 12px;
+    padding: 20px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.tweet-container:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 6px 15px rgba(0, 0, 0, 0.15);
+}
+
+.user-info {
+    display: flex;
+    align-items: center;
+    font-size: 16px;
+    color: #333;
+}
+
+.avatar {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    margin-right: 12px;
+}
+
+.retweet {
+    font-size: 14px;
+    color: #666;
+    font-style: italic;
+}
+
+.content,
+.quote-content {
+    margin-top: 10px;
+    font-size: 16px;
+    color: #333;
+    line-height: 1.5;
+    white-space: pre-wrap;
+    word-wrap: break-word;
+}
+
+
+.translated-content {
+    margin-top: 10px;
+    font-size: 14px;
+    color: #0088ff;
+    background: rgba(0, 136, 255, 0.1);
+    border-left: 4px solid #0088ff;
+    padding: 10px;
+    border-radius: 8px;
+}
+
+
+.translated-label {
+    font-weight: bold;
+    color: #0055aa;
+    display: block;
+}
+
+
+.tweet-footer {
+    font-size: 14px;
+    color: #777;
+    margin-top: 10px;
+    text-align: right;
+}
+
+
+.media img,
+.media video {
+    max-width: 100%;
+    max-height: 300px;
+    border-radius: 10px;
+    margin-top: 10px;
+    object-fit: cover;
+    cursor: pointer;
+    transition: transform 0.2s ease-in-out;
+}
+
+.media img:hover,
+.media video:hover {
+    transform: scale(1.02);
+}
+
+.lightbox {
+    visibility: hidden;
+    opacity: 0;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.8);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+    transition: opacity 0.3s ease-in-out, visibility 0.3s;
+}
+
+.lightbox.active {
+    visibility: visible;
+    opacity: 1;
+}
+
+
+.lightbox img {
+    max-width: 90vw;
+    max-height: 90vh;
+    border-radius: 10px;
+    box-shadow: 0 4px 15px rgba(255, 255, 255, 0.2);
+    object-fit: contain;
+}
+
+
+.lightbox-close {
+    position: absolute;
+    top: 20px;
+    right: 30px;
+    font-size: 24px;
+    color: white;
+    cursor: pointer;
+}
+
+.link-preview,
+.quote {
+    margin-top: 12px;
+    border-left: 4px solid #ff758c;
+    padding: 10px;
+    border-radius: 8px;
+    background: rgba(255, 117, 140, 0.1);
+}
+
+
+.filter-button {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    background: linear-gradient(135deg, #0088ff, #0055aa);
+    color: white;
+    border: none;
+    padding: 12px 24px;
+    border-radius: 30px;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: bold;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    transition: background 0.3s ease, transform 0.2s ease;
+}
+
+.filter-button:hover {
+    background: linear-gradient(135deg, #0070dd, #003f88);
+    transform: scale(1.1);
+}
+
+
+.modal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    justify-content: center;
+    align-items: center;
+}
+
+.modal-content {
+    background: white;
+    padding: 30px;
+    border-radius: 12px;
+    width: 90%;
+    max-width: 400px;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+    animation: fadeIn 0.3s ease-in-out;
+}
+
+.modal-content label {
+    font-size: 14px;
+    font-weight: bold;
+    display: block;
+    margin-top: 3px;
+}
+
+.modal-content select,
+.modal-content button {
+    width: 100%;
+    padding: 12px;
+    margin-top: 5px;
+    margin-bottom: 10px;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    font-size: 14px;
+    transition: background 0.3s ease, transform 0.2s ease;
+}
+
+.modal-content button {
+    background: linear-gradient(135deg, #0088ff, #0055aa);
+    color: white;
+    border: none;
+    cursor: pointer;
+    font-weight: bold;
+}
+
+.modal-content button:hover {
+    background: linear-gradient(135deg, #0070dd, #003f88);
+    transform: scale(1.05);
+}
+
+.close-modal {
+    display: block;
+    text-align: right;
+    font-size: 18px;
+    font-weight: bold;
+    color: #333;
+    cursor: pointer;
+}
+
+.close-btn {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    font-size: 30px;
+    color: white;
+    background: none;
+    border: none;
+    cursor: pointer;
+    z-index: 1001;
+}
+
+.close-modal:hover {
+    color: #000;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: scale(0.95);
+    }
+
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+@media (prefers-color-scheme: dark) {
+    body {
+        background: linear-gradient(135deg, #1a1a2e, #16213e);
+        color: #ddd;
+    }
+
+    .tweet-container {
+        background: #222;
+        color: #ddd;
+        box-shadow: 0 4px 10px rgba(255, 255, 255, 0.1);
+    }
+
+    .tweet-container:hover {
+        box-shadow: 0 6px 15px rgba(255, 255, 255, 0.15);
+    }
+
+    .user-info {
+        color: #ccc;
+    }
+
+    .retweet {
+        color: #aaa;
+    }
+
+    .content,
+    .quote-content {
+        color: #ddd;
+    }
+
+    .translated-content {
+        color: #66b3ff;
+        background: rgba(102, 179, 255, 0.1);
+        border-left: 4px solid #66b3ff;
+    }
+
+    .translated-label {
+        color: #3399ff;
+    }
+
+    .tweet-footer {
+        color: #999;
+    }
+
+    .link-preview,
+    .quote {
+        border-left: 4px solid #ff758c;
+        background: rgba(255, 117, 140, 0.2);
+    }
+
+    .filter-button {
+        background: linear-gradient(135deg, #0066cc, #003366);
+    }
+
+    .filter-button:hover {
+        background: linear-gradient(135deg, #0055aa, #002244);
+    }
+
+    .modal-content {
+        background: #2a2a2a;
+        color: #ddd;
+    }
+
+    .modal-content select,
+    .modal-content button {
+        background: #333;
+        color: white;
+        border: 1px solid #555;
+    }
+
+    .modal-content button {
+        background: linear-gradient(135deg, #0066cc, #003366);
+    }
+
+    .modal-content button:hover {
+        background: linear-gradient(135deg, #0055aa, #002244);
+    }
+
+    .close-modal {
+        color: #bbb;
+    }
+
+    .close-modal:hover {
+        color: white;
+    }
+}
+
+
+html[data-theme="dark"] body {
+    background: linear-gradient(135deg, #1a1a2e, #16213e);
+    color: #ddd;
+}
+
+html[data-theme="dark"] .tweet-container {
+    background: #222;
+    color: #ddd;
+    box-shadow: 0 4px 10px rgba(255, 255, 255, 0.1);
+}
+
+html[data-theme="dark"] .tweet-container:hover {
+    box-shadow: 0 6px 15px rgba(255, 255, 255, 0.15);
+}
+
+html[data-theme="dark"] .user-info {
+    color: #ccc;
+}
+
+html[data-theme="dark"] .retweet {
+    color: #aaa;
+}
+
+html[data-theme="dark"] .content,
+html[data-theme="dark"] .quote-content {
+    color: #ddd;
+}
+
+html[data-theme="dark"] .translated-content {
+    color: #66b3ff;
+    background: rgba(102, 179, 255, 0.1);
+    border-left: 4px solid #66b3ff;
+}
+
+html[data-theme="dark"] .tweet-footer {
+    color: #999;
+}
+
+html[data-theme="dark"] .filter-button {
+    background: linear-gradient(135deg, #0066cc, #003366);
+}
+
+html[data-theme="dark"] .filter-button:hover {
+    background: linear-gradient(135deg, #0055aa, #002244);
+}
+
+/* 强制浅色模式 */
+html[data-theme="light"] body {
+    background: #edf2fa;
+    color: #333;
+}
+
+html[data-theme="light"] .tweet-container {
+    background: white;
+    color: #333;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+html[data-theme="light"] .tweet-container:hover {
+    box-shadow: 0 6px 15px rgba(0, 0, 0, 0.15);
+}
+
+html[data-theme="light"] .user-info {
+    color: #333;
+}
+
+html[data-theme="light"] .retweet {
+    color: #666;
+}
+
+html[data-theme="light"] .content,
+html[data-theme="light"] .quote-content {
+    color: #333;
+}
+
+html[data-theme="light"] .translated-content {
+    color: #0088ff;
+    background: rgba(0, 136, 255, 0.1);
+    border-left: 4px solid #0088ff;
+}
+
+html[data-theme="light"] .tweet-footer {
+    color: #777;
+}
+
+html[data-theme="light"] .filter-button {
+    background: linear-gradient(135deg, #0088ff, #0055aa);
+}
+
+html[data-theme="light"] .filter-button:hover {
+    background: linear-gradient(135deg, #0070dd, #003f88);
+}
+
+html[data-theme="dark"] .modal-content {
+    background: #2a2a2a;
+    color: #ddd;
+}
+
+html[data-theme="dark"] .modal-content select,
+html[data-theme="dark"] .modal-content button {
+    background: #333;
+    color: white;
+    border: 1px solid #555;
+}
+
+html[data-theme="dark"] .modal-content button {
+    background: linear-gradient(135deg, #0066cc, #003366);
+}
+
+html[data-theme="dark"] .modal-content button:hover {
+    background: linear-gradient(135deg, #0055aa, #002244);
+}
+
+html[data-theme="dark"] .close-modal {
+    color: #bbb;
+}
+
+html[data-theme="dark"] .close-modal:hover {
+    color: white;
+}
+
+html[data-theme="light"] .modal-content {
+    background: white;
+    color: #333;
+}
+
+html[data-theme="light"] .modal-content select,
+html[data-theme="light"] .modal-content button {
+    background: #f8f9fd;
+    color: black;
+    border: 1px solid #ccc;
+}
+
+html[data-theme="light"] .modal-content button {
+    background: linear-gradient(135deg, #0088ff, #0055aa);
+}
+
+html[data-theme="light"] .modal-content button:hover {
+    background: linear-gradient(135deg, #0070dd, #003f88);
+}
+
+html[data-theme="light"] .close-modal {
+    color: #333;
+}
+
+html[data-theme="light"] .close-modal:hover {
+    color: black;
+}
