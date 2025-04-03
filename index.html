@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Sanapri Tweets Clone</title>
+  <link rel="stylesheet" href="Data/theme/default.css" />
+</head>
+
+<body>
+  <div class="content">
+    <button class="filter-button" onclick="openSettings()">设置</button>
+    <div id="tweets"></div>
+  </div>
+  <div class="lightbox" id="lightbox">
+    <img id="lightbox-img" src="" alt="Fullscreen Image" />
+    <button class="close-btn" id="close-lightbox">×</button>
+  </div>
+  <div class="modal" id="filterModal">
+    <div class="modal-content">
+      <span class="close-modal" onclick="closeModal()">&times;</span>
+
+      <h3>推文显示</h3>
+      <label for="year">选择年份：</label>
+      <select id="year" onchange="applyFilter()">
+        <option value="">全部</option>
+        <option value="2025">2025（17条）</option>
+        <option value="2024">2024（26条）</option>
+        <option value="2023">2023（30条）</option>
+        <option value="2022">2022（34条）</option>
+        <option value="2021">2021（74条）</option>
+        <option value="2020">2020（16条）</option>
+        <option value="2019">2019（34条）</option>
+        <option value="2018">2018（75条）</option>
+      </select>
+
+      <label for="sortOrder">排序：</label>
+      <select id="sortOrder" onchange="applyFilter()">
+        <option value="desc">最新优先</option>
+        <option value="asc">最早优先</option>
+      </select>
+
+      <label for="timezone">时区：</label>
+      <select id="timezone" onchange="applyFilter()">
+        <option value="system">跟随系统时区</option>
+        <option value="Pacific/Honolulu">UTC-10:00 (火奴鲁鲁)</option>
+        <option value="America/Los_Angeles">UTC-08:00 (洛杉矶, 温哥华)</option>
+        <option value="America/Denver">UTC-07:00 (丹佛, 凤凰城)</option>
+        <option value="America/Chicago">UTC-06:00 (芝加哥, 墨西哥城)</option>
+        <option value="America/New_York">UTC-05:00 (纽约, 多伦多)</option>
+        <option value="America/Halifax">UTC-04:00 (哈利法克斯, 圣约翰)</option>
+        <option value="Europe/London">UTC±00:00 (伦敦, 里斯本)</option>
+        <option value="Europe/Paris">UTC+01:00 (巴黎, 柏林, 马德里)</option>
+        <option value="Europe/Moscow">UTC+03:00 (莫斯科, 圣彼得堡)</option>
+        <option value="Asia/Dubai">UTC+04:00 (迪拜, 阿布扎比)</option>
+        <option value="Asia/Kolkata">UTC+05:30 (新德里, 孟买)</option>
+        <option value="Asia/Bangkok">UTC+07:00 (曼谷, 河内)</option>
+        <option value="Asia/Shanghai">UTC+08:00 (上海, 北京, 香港)</option>
+        <option value="Asia/Tokyo">UTC+09:00 (东京, 首尔)</option>
+        <option value="Australia/Sydney">UTC+10:00 (悉尼, 墨尔本)</option>
+        <option value="Pacific/Auckland">UTC+12:00 (奥克兰, 惠灵顿)</option>
+      </select>
+
+      <label>
+        <input type="checkbox" id="showTranslation" checked onchange="applyFilter()" /> 显示翻译
+      </label>
+
+      <h3>显示模式</h3>
+      <label for="theme">选择主题：</label>
+      <select id="theme" onchange="changeTheme(this.value)">
+        <option value="auto">跟随系统显示设置</option>
+        <option value="light">浅色模式</option>
+        <option value="dark">深色模式</option>
+      </select>
+
+      <h3>关于作者</h3>
+      <!-- <p><a href="#" target="_blank">GitHub</a></p> -->
+      <p>Bilibili: <a href="https://space.bilibili.com/414876223" target="_blank">仮想セカヰ</a></p>
+      <p>Twitter: <a href="https://x.com/KasouSekai_" target="_blank">仮想セカヰ</a></p>
+
+      <!-- <button onclick="applyFilter(); closeModal()">保存设置</button> -->
+    </div>
+  </div>
+  <script>
+    let profileData = {};
+
+    function convertLinks(text) {
+      const urlRegex = /(https?:\/\/[^\s]+)/g;
+      return text.replace(urlRegex, '<a href="$1" target="_blank">$1</a>');
+    }
+
+    async function loadProfileData() {
+      try {
+        const response = await fetch("Data/profile.json");
+        profileData = await response.json();
+      } catch (error) {
+        console.error("无法加载头像信息:", error);
+      }
+    }
+
+    async function getFolders(year = null, sortOrder = "desc") {
+      try {
+        const response = await fetch("Data/index.json");
+        let folders = await response.json();
+
+        folders.sort((a, b) => b.localeCompare(a));
+
+        if (sortOrder === "asc") {
+          folders.reverse();
+        }
+
+        if (year) {
+          folders = folders.filter((folder) => folder.startsWith(year));
+        }
+        folders = folders.map((folder) => `Data/${folder}`);
+        return folders;
+      } catch (error) {
+        console.error("无法加载文件夹列表:", error);
+        return [];
+      }
+    }
+
+    async function loadTweet(folder, showTranslation) {
+      const tweetContainer = document.getElementById("tweets");
+      const tweetDiv = document.createElement("div");
+      tweetDiv.className = "tweet-container";
+
+      try {
+        const response = await fetch(`${folder}/info.json`);
+        const data = await response.json();
+        const avatar = `Data/${profileData[data.username] || "default-avatar.jpg"
+          }`;
+        const selectedTimezone = document.getElementById("timezone").value === "system" 
+          ? Intl.DateTimeFormat().resolvedOptions().timeZone 
+          : document.getElementById("timezone").value;
+        const formattedTime = new Date(data.time).toLocaleString("zh-CN", { timeZone: selectedTimezone });
+
+        let contentHTML = "";
+        if (data.retweet) {
+          contentHTML += `<div class="retweet">鎖那@sanapri 转推了</div>`;
+        }
+
+        contentHTML += `<div class="user-info">
+            <img src="${avatar}" class="avatar" alt="Avatar"><strong>${data.username
+          }</strong>
+            </div><div class="content">${convertLinks(data.content).replace(
+            /\n/g,
+            "<br>"
+          )}</div>`;
+
+        if (data.translate) {
+          if (showTranslation) {
+            contentHTML += `<div class="translated-content"><span class="translated-label">推文翻译:</span><br>${data.translate.replace(
+              /\n/g,
+              "<br>"
+            )}</div>`;
+          }
+        }
+
+        if (data.picture > 0) {
+          contentHTML += `<div class="media">`;
+          for (let i = 1; i <= data.picture; i++) {
+            contentHTML += `<img src="${folder}/picture_${i}.jpg" alt="Picture ${i}">`;
+          }
+          contentHTML += `</div>`;
+        }
+
+        if (data.video > 0) {
+          contentHTML += `<div class="media">`;
+          for (let i = 1; i <= data.video; i++) {
+            contentHTML += `<video id="video_${folder}_${i}" controls><source src="${folder}/video_${i}.mp4" type="video/mp4"></video>`;
+          }
+          contentHTML += `</div>`;
+        }
+
+        if (data.link > 0) {
+          const linkResponse = await fetch(`${folder}/link.json`);
+          const linkData = await linkResponse.json();
+          contentHTML += `<div class="link-preview"><a href="${linkData.link}" target="_blank"><strong>${linkData.title}</strong></a><p>${linkData.description}</p></div>`;
+        }
+
+        if (data.quote > 0) {
+          const quoteResponse = await fetch(`${folder}/quote.json`);
+          const quoteData = await quoteResponse.json();
+          const quoteAvatar = `Data/${profileData[quoteData.username] || "default-avatar.jpg"
+            }`;
+          let quoteHTML = `<div class="quote"><div class="user-info"><img src="${quoteAvatar}" class="avatar" alt="Avatar"><strong>${quoteData.username}</strong></div><div class="quote-content">${convertLinks(quoteData.content)}</div>`;
+          if (quoteData.picture > 0) {
+            quoteHTML += `<div class="media">`;
+            for (let i = 1; i <= quoteData.picture; i++) {
+              quoteHTML += `<img src="${folder}/quote_picture_${i}.jpg" alt="Quote Picture ${i}">`;
+            }
+            quoteHTML += `</div>`;
+          }
+          if (quoteData.link > 0) {
+            const quoteLinkResponse = await fetch(
+              `${folder}/quote_link.json`
+            );
+            const quoteLinkData = await quoteLinkResponse.json();
+            quoteHTML += `<div class="link-preview"><a href="${quoteLinkData.link}" target="_blank"><strong>${quoteLinkData.title}</strong></a><p>${quoteLinkData.description}</p></div>`;
+          }
+          quoteHTML += `</div>`;
+          contentHTML += quoteHTML;
+        }
+
+        contentHTML += `<div class="tweet-footer">${formattedTime}</div>`;
+        tweetDiv.innerHTML = contentHTML;
+        tweetContainer.appendChild(tweetDiv);
+
+        tweetDiv.querySelectorAll("video").forEach((video) => {
+          video.addEventListener("loadedmetadata", function () {
+            if (this.duration > 0 && this.duration < 10) {
+              this.muted = true;
+              this.loop = true;
+              this.play();
+            }
+          });
+          if (
+            video.readyState >= 2 &&
+            video.duration > 0 &&
+            video.duration < 10
+          ) {
+            video.muted = true;
+            video.loop = true;
+            video.play();
+          }
+        });
+      } catch (error) {
+        console.error("加载推文失败:", error);
+      }
+    }
+
+    async function loadAllTweets(
+      year = null,
+      sortOrder = "desc",
+      showTranslation = true,
+      timezone = "UTC"
+    ) {
+      await loadProfileData();
+      const folders = await getFolders(year, sortOrder);
+      const tweetContainer = document.getElementById("tweets");
+      tweetContainer.innerHTML = "";
+
+      for (const folder of folders) {
+        await loadTweet(folder, showTranslation);
+      }
+    }
+    function openSettings() {
+      document.getElementById("filterModal").style.display = "flex";
+    }
+
+    function closeModal() {
+      document.getElementById("filterModal").style.display = "none";
+    }
+    function applyFilter() {
+      const year = document.getElementById("year").value || null;
+      const sortOrder = document.getElementById("sortOrder").value;
+      const showTranslation =
+        document.getElementById("showTranslation").checked;
+      const timezone = document.getElementById("timezone").value;
+
+      loadAllTweets(year, sortOrder, showTranslation, timezone);
+    }
+
+    function changeTheme(theme) {
+      if (theme === "auto") {
+        document.documentElement.removeAttribute("data-theme");
+        localStorage.removeItem("theme");
+      } else {
+        document.documentElement.setAttribute("data-theme", theme);
+        localStorage.setItem("theme", theme);
+      }
+    }
+
+    (function () {
+      const savedTheme = localStorage.getItem("theme") || "auto";
+      if (savedTheme === "auto") {
+        document.documentElement.removeAttribute("data-theme");
+      } else {
+        document.documentElement.setAttribute("data-theme", savedTheme);
+      }
+      document.getElementById("theme").value = savedTheme;
+    })();
+
+    document.addEventListener("click", (event) => {
+      const target = event.target;
+      if (target.tagName === "IMG" && target.closest(".media")) {
+        const lightbox = document.getElementById("lightbox");
+        const lightboxImg = document.getElementById("lightbox-img");
+        lightboxImg.src = target.src;
+        lightbox.classList.add("active");
+      }
+    });
+    document.getElementById("lightbox").addEventListener("click", (event) => {
+      if (event.target !== document.getElementById("lightbox-img")) {
+        closeLightbox();
+      }
+    });
+
+    function closeLightbox() {
+      document.getElementById("lightbox").classList.remove("active");
+    }
+
+    loadAllTweets();
+  </script>
+</body>
+
+</html>
