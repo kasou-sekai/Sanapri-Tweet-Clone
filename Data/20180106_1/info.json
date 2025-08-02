@@ -1,5 +1,6 @@
 {
-    "username": "鎖那@sanapri",
+    "name": "鎖那",
+    "username": "sanapri",
     "time": "2018-01-06T06:20:37.000Z",
     "content": "#新しいプロフィール画像",
     "picture": 1,
@@ -7,5 +8,5 @@
     "link": 0,
     "quote": 0,
     "retweet": false,
-    "translate":"#新头像"
+    "translate": "#新头像"
 }

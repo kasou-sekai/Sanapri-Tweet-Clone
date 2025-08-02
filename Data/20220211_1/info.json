@@ -1,10 +1,11 @@
 {
-  "username": "鎖那@sanapri",
-  "time": "2022-02-11T13:39:05.000Z",
-  "content": "🌑",
-  "picture": 1,
-  "video": 0,
-  "link": 0,
-  "quote": 0,
-  "retweet": false
+    "name": "鎖那",
+    "username": "sanapri",
+    "time": "2022-02-11T13:39:05.000Z",
+    "content": "🌑",
+    "picture": 1,
+    "video": 0,
+    "link": 0,
+    "quote": 0,
+    "retweet": false
 }

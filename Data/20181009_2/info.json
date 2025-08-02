@@ -1,5 +1,6 @@
 {
-    "username": "鎖那@sanapri",
+    "name": "鎖那",
+    "username": "sanapri",
     "time": "2018-10-09T14:47:58.000Z",
     "content": "あの、あの今月末にOPENRECで配信したいなと思ってます。",
     "picture": 0,
@@ -7,5 +8,5 @@
     "link": 1,
     "quote": 0,
     "retweet": false,
-    "translate":"那个，那个今月底要在OPENREC上进行直播。"
+    "translate": "那个，那个今月底要在OPENREC上进行直播。"
 }
